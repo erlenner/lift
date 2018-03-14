@@ -1,0 +1,13 @@
+*.o
+*.swp
+*.swo
+massif.*
+.tup/
+*.asv
+*~
+*.jpg
+*.png
+!dependency-graph.png
+build-*/*
+!build-*/tup.config
+.DS_Store

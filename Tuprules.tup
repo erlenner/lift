@@ -1,0 +1,29 @@
+CC = g++-6
+ROS_GEN_CPP = $(TUP_CWD)/external/ros_gen_cpp
+TOP = $(TUP_CWD)
+
+CFLAGS += -std=c++17
+CFLAGS += -O2
+CFLAGS += -Wall
+CFLAGS += -g
+
+INCLUDES += -I$(TOP)/src
+INCLUDES += -I$(TOP)/external/include
+INCLUDES += -I$(TOP)/external/lib
+
+LIBS += -L$(TOP)/external/lib
+LIBS += -Wl,-rpath,'$ORIGIN/$(TOP)/external/lib'
+LIBS += -Wl,-rpath,'$ORIGIN/$(TOP)/../external/lib'
+LIBS += -lpthread
+
+# Compile position independent object code
+!cc = |> ^co CC %f^ $(CC) -fPIC -c %f -o %o $(CFLAGS) $(INCLUDES) |> %B.o
+
+# Link shared library
+!ld = |> ^co LD %o^ $(CC) %f -Wl,--no-undefined -shared -o %o $(LIBS) |> ../lib%d.so $(TOP)/<gen_libs>
+
+# Link executable binary
+!lb = |> ^co LD %o^ $(CC) %f -o %o $(LIBS) |>
+
+# Link executable binary with shared libraries from external/lib
+!lbso = | $(TOP)/external/lib/lib*.so $(TOP)/<gen_libs> |> ^co LD %o^ $(CC) %f -o %o $(LIBS) `for f in ../../external/lib/lib*.so; do basename "$f" .so| sed -r 's/^.{3}//;s/^/-l/' | tr '\n' ' '; done`|> %d

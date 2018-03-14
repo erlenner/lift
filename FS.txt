@@ -1,0 +1,34 @@
+global N = number of floors
+
+global NOT_ON_THE_WAY_PENALTY, DIFF_FLOORS_PENALTY, RESPONSE_TIME_PENALTY
+
+
+calculate_FS (Figure of Suitability):
+INPUT: external order, current elevator
+
+    cur_n = floor of the current elevator
+    ex_n = floor where the external order came from
+
+    boolean GOING_UP = current elevator is going up
+    boolean GOING_DOWN = current elevator is going down
+
+    RESPONSE_TIME = the number of seconds since last time the state of the current elevator was recorded
+
+    DIFF_FLOORS = number of floors from the elevators current floor to where the external order came from
+
+    boolean ON_THE_WAY = the elevator is going in the direction of where the external order came from
+
+    boolean CORRECT_DIRECTION = the elevator is going in the direction that the external order wants to go
+
+    if !CORRECT_DIRECTION: DIFF_FLOORS = GOING_UP*(2N-ex_n-cur_n) + GOING_DOWN*(cur_n+ex_n);
+    
+    FS = !ON_THE_WAY*NOT_ON_THE_WAY_PENALTY + DIFF_FLOORS * DIFF_FLOORS_PENALTY + RESPONSE_TIME * RESPONSE_TIME_PENALTY
+
+
+# FS is created for all elevators for each new external order, updated on each received state and deleted when the external order is taken by some elevator.
+# FS.age is an integer that is incremented each time the elevator broadcasts its state.
+
+FS < operator
+INPUT: rhs (right hand side)
+
+self.fs < rhs.fs && abs(self.fs - rhs.fs) > fs.age
